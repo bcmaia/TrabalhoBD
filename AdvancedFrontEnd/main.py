@@ -1,3 +1,6 @@
+# EXECUTE `pip install -r requirements.txt` PARA INSTALAR BIBLIOTECAS 
+# NECESSÁRIAS
+
 import os
 from dotenv import load_dotenv
 
