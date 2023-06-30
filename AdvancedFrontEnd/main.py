@@ -4,23 +4,6 @@ from time import sleep
 from services import Db, page
 
 
-# EXTREMELY IMPORTANT INITIALIZATIONS
-print('Iniciando serviços... ', end='')
-sleep(0.250)
-print('Done!')
-print('Autenticando cliente.. ', end='')
-sleep(0.250)
-print('Done!')
-print('Carregando bibliotecas... ', end='')
-sleep(0.500)
-print('Done!')
-print('Simplificando Arvore de Dependências... ', end='')
-sleep(0.250)
-print('Done!')
-print('Resolvendo o protocolo LABMIA... ', end='')
-sleep(0.250)
-print('Done!')
-
 # DB conection
 print('Conectando a base de dados... ', end='')
 #db = Db()
@@ -39,20 +22,10 @@ print('Done!')
 # db.disconnect()
 
 
-
-
-
-
-
-app = typer.Typer()
-
-
-@app.command()
 def hello(name: str):
     print(f"Hello {name}")
 
 
-@app.command()
 def goodbye(name: str, formal: bool = False):
     if formal:
         print(f"Goodbye Ms. {name}. Have a good day.")
@@ -60,5 +33,22 @@ def goodbye(name: str, formal: bool = False):
         print(f"Bye {name}!")
 
 
+
+def test_cdm(param : list[str]):
+    print('testing')
+
+cmds = {
+    'test': test_cdm
+}
+
+def main():
+    i = input('> ')
+    param = [x for x in i if not x]
+    cmd = cmds[param[0]]
+
+    typer.run(cmd, param)
+
 if __name__ == "__main__":
-    app()
+    typer.run(main)
+
+    
