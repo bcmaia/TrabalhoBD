@@ -3,7 +3,7 @@ import traceback
 from utils import Db, page
 
 
-global_state = {'debug': True}
+global_state = {'debug': False}
 
 
 print('Inicializando sessão...', end='')
@@ -124,19 +124,19 @@ def search(params : list[str], flags : dict[str, any]):
     print('\n'.join(readable_results))
 
 
-def list_func (param : list[str], flags : dict[str, any]):
+def list_func (params : list[str], flags : dict[str, any]):
     result = db.query('SELECT * FROM SITE')
 
-    print('USUÁRIOS: ')
+    print('SITES: ')
     print('\n'.join([f'{i}: {v}' for i, v in enumerate(result)]))
     
 
-def delete(param : list[str], flags : dict[str, any]):
-    print('BUSCANDO...')
+def delete(params: list[str], flags : dict[str, any]):
+    print('DELETANDO...')
 
     val = params[0] if params else None
     
-    sql = 'DELETE NOME, URL, DONO FROM SITE WHERE '
+    sql = 'DELETE FROM SITE WHERE '
 
     where = ['URL = :val'] if val else []
     params = {'val': val} if val else {}
@@ -159,9 +159,8 @@ def delete(param : list[str], flags : dict[str, any]):
         print('SQL value:')
         print(sql)
     
-    result = db.query(sql, params)
-    readable_results = [f'{i}: {v}' for i, v in enumerate(result)]
-
+    db.trans(sql, params).commit()
+   
     print('Cadastro deletado com sucesso!')
 
 commands = {
@@ -188,7 +187,11 @@ commands = {
     'insert': {
         'h': 'Cadastra um novo site.',
         'f': insert,
-    }
+    },
+    'delete': {
+        'h': 'Deleta um site.',
+        'f': delete,
+    },
 }
 
 
