@@ -1,0 +1,17 @@
+=======================================================
+======//  Bem-vindo ao Recursos Mínimos //=============
+=======================================================
+
+Comandos disponíveis:
+- pesquisa: Realiza uma pesquisa no banco de dados.
+- ac: Executa uma ação específica.
+
+Comandos adicionais:
+- ajuda: Exibe esta mensagem de ajuda.
+- sair: Sai do programa.
+
+=======================================================
+
+Digite um comando ou 'ajuda' para ver a lista de comandos.
+
+> 

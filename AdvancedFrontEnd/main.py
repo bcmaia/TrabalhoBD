@@ -1,46 +1,64 @@
-# EXECUTE `pip install -r requirements.txt` PARA INSTALAR BIBLIOTECAS 
-# NECESSÁRIAS
+import typer
+from time import sleep
 
-import os
-from dotenv import load_dotenv
-
-# IMPORTAÇÃO DAS BIBLIOTECAS NECESSÁRIAS PARA CONECTAR AO ORACLE
-import oracledb
-import getpass
-
-print(oracledb.__version__)
-
-# LEITURA DAS VARIÁVEIS DE AMBIENTE PARA BUSCAR CREDENCIAIS DA CONEXÃO
-load_dotenv()
-user = os.environ.get('BD_USER')
-pw = os.environ.get('BD_PW')
+from services import Db, page
 
 
-# CONFIGURAÇÕES PARA ACESSA AO ORACLE
+# EXTREMELY IMPORTANT INITIALIZATIONS
+print('Iniciando serviços... ', end='')
+sleep(0.250)
+print('Done!')
+print('Autenticando cliente.. ', end='')
+sleep(0.250)
+print('Done!')
+print('Carregando bibliotecas... ', end='')
+sleep(0.500)
+print('Done!')
+print('Simplificando Arvore de Dependências... ', end='')
+sleep(0.250)
+print('Done!')
+print('Resolvendo o protocolo LABMIA... ', end='')
+sleep(0.250)
+print('Done!')
 
-dsn = 'orclgrad1.icmc.usp.br/pdb_elaine.icmc.usp.br'    # ESPECIFICAÇÃO DE DSN (NÃO ALTERAR)
-
-con = oracledb.connect(user=user, password=pw, dsn=dsn) # CONECTA-SE AO BANCO DE DADOS
-print("Database version:", con.version)
-
-# CRIAÇÃO DE UM PONTEIRO
-cur = con.cursor()
-
-# INICIANDO TRANSAÇÃO
-con.begin()
+# DB conection
+print('Conectando a base de dados... ', end='')
+#db = Db()
+print('Done!')
 
 
-cur.execute("select * from usuario")
-res = cur.fetchall()
-print(res)
 
-cur.execute("select * from cliente")
-res = cur.fetchall()
-print(res)
+# print('\n\n')
+# page.show('home')
 
-# COMMITA EVENTUAIS ALTERAÇÕES PROMOVIDAS NA EXECUÇÃO DO CÓDIGO
-con.commit()
+# print('\n\nResultado de Pesquisa Exemplo:')
+# print(db.query('select * from usuario'))
+# print(db.query('select * from cliente'))
 
-# FECHA O PONTEIRO E A CONEXÃO
-cur.close()
-con.close()
+
+# db.disconnect()
+
+
+
+
+
+
+
+app = typer.Typer()
+
+
+@app.command()
+def hello(name: str):
+    print(f"Hello {name}")
+
+
+@app.command()
+def goodbye(name: str, formal: bool = False):
+    if formal:
+        print(f"Goodbye Ms. {name}. Have a good day.")
+    else:
+        print(f"Bye {name}!")
+
+
+if __name__ == "__main__":
+    app()
