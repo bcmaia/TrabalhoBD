@@ -1,7 +1,7 @@
 
 Se você não tiver o venv instalado: 
 ```
-    python -m pip install venv
+    python3 -m pip install --user virtualenv
 ```
 
 Para criar o venv, vá para o diretório da aplicação e execute
