@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 import oracledb
 import getpass
 
-print(oracledb.__version__)
+
+print('Inicializando sessão...')
+print('Versão do oracle:', oracledb.__version__)
 
 
 
@@ -68,13 +70,15 @@ class Db:
         if not self.__active: raise Exception('ERROR: Connection lost.')
         return self
     
-    def query (self, query):
-        self.validate().__cur.execute(query)
+    def query (self, query, vals = None):
+        if None == query: self.validate().__cur.execute(query)
+        else: self.validate().__cur.execute(query, vals)
         res = self.__cur.fetchall()
         return res
     
-    def trans (self, query):
-        self.validate().__cur.execute(query)
+    def trans (self, query, vals = None):
+        if None == query: self.validate().__cur.execute(query)
+        else: self.validate().__cur.execute(query, vals)
         return self
     
     def commit(self):
@@ -91,5 +95,3 @@ class Db:
         self.__active = False
 
         return self
-
-
