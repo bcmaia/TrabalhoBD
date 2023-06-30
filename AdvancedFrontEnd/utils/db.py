@@ -71,7 +71,7 @@ class Db:
         return self
     
     def query (self, query, vals = None):
-        if None == query: self.validate().__cur.execute(query)
+        if None == vals: self.validate().__cur.execute(query)
         else: self.validate().__cur.execute(query, vals)
         res = self.__cur.fetchall()
         return res
