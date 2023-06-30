@@ -1,8 +1,0 @@
-cffi          
-cryptography  
-getpass3    
-oracledb    
-pip         
-pycparser 
-python-dotenv 
-setuptools    
