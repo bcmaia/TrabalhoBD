@@ -1,20 +1,19 @@
-import typer
 import traceback
-from utils import Db, page
+from utils import Db
 
 
-global_state = {'debug': True}
+# Variáveis 'globais'
+global_state = {'debug': False}
 
 
-print('Inicializando sessão...', end='')
+# Inicializando a Base de Dados
+print('Inicializando sessão, isso pode demorar um pouco...', end='')
 db = Db()
 print(' pronto!\n\n', end='')
 
 
-flags = {
-    '--help' : None,
-}
-
+# Parse params
+# Lê uma string e analiza os parametros, filtrando --flags.
 def parse_params (params : list[str]):
     if not params: return ({}, [])
 
@@ -37,20 +36,33 @@ def parse_params (params : list[str]):
             myParams.append(i)
 
     return {'flags': myFlags, 'params': myParams}
-        
 
+
+# Set Debug
+# Essa função permite ativar o modo de debug. Não é muito útil para o usuário 
+# final, mas é extremamente útil para os desenvolvedores.
 def set_debug(param : list[str], flags : dict[str, any]):
     global_state['debug'] = 'true' == param[0]
     if not param[0] in ['true', 'false']:
         raise Exception(f'[ERRO] Valor não esperado ("{param[0]}").')
     print(f'Debug now set to {global_state["debug"]}')
 
+
+# No operation
+# Não faz nada, mas ela é usada para codificar o comando quit que não é 
+# processado da mesma maneira que os outros comandos.
 def noop(param : list[str], flags : dict[str, any]):
     pass
 
+
+# Hello, World!
+# Um clássico da programação. Está aqui para auxiliar testes
 def hello(param : list[str], flags : dict[str, any]):
     print('Olá, Mundo!')
 
+
+# Função auxiliar: where_flags
+# Ela gera o codigo sql e um dicionario com os parametros necessários.
 def where_flags (atrbs : list[str], flags : dict[str, any]):
     where = []
     d = dict()
@@ -65,6 +77,9 @@ def where_flags (atrbs : list[str], flags : dict[str, any]):
 
     return (where, d)
 
+
+
+# INSERT NEW SITE
 def insert(params : list[str], flags : dict[str, any]):
     print('CADASTRANDO O NOVO SITE...')
 
@@ -87,14 +102,18 @@ def insert(params : list[str], flags : dict[str, any]):
     print('Cadastro finalizado com sucesso!')
 
 
-
+# SEARCH SITE
 def search(params : list[str], flags : dict[str, any]):
     print('BUSCANDO...')
 
+    # Temos o parametro padrão de busca
     val = params[0] if params else None
     
+    # Estrutura base da query sql
     sql = 'SELECT NOME, URL, DONO FROM SITE WHERE '
 
+    # Definindo condições de busca
+    # Qual as condições? Pode ter mais de uma.
     where = ['URL = :val'] if val else []
     params = {'val': val} if val else {}
 
@@ -102,20 +121,24 @@ def search(params : list[str], flags : dict[str, any]):
     where = where + w
     params.update(d)
 
+    # debug
     if global_state['debug']: 
         print('Where value:')
         print(where)
         print('Params value:')
         print(params)
 
+    # Tratando erros
     if not where: raise Exception('[ERRO] Os dados providos são insuficentes.')
 
+    # compondo a query sql final
     sql = sql + ' AND '.join(where)
     
     if global_state['debug']: 
         print('SQL value:')
         print(sql)
     
+    # Execuntando a query
     result = db.query(sql, params)
     readable_results = [f'{i}: {v}' for i, v in enumerate(result)]
 
@@ -124,19 +147,23 @@ def search(params : list[str], flags : dict[str, any]):
     print('\n'.join(readable_results))
 
 
-def list_func (param : list[str], flags : dict[str, any]):
+
+# LIST ALL SITES
+def list_func (params : list[str], flags : dict[str, any]):
     result = db.query('SELECT * FROM SITE')
 
-    print('USUÁRIOS: ')
+    print('SITES: ')
     print('\n'.join([f'{i}: {v}' for i, v in enumerate(result)]))
     
 
-def delete(param : list[str], flags : dict[str, any]):
-    print('BUSCANDO...')
+
+# DELETE SITE
+def delete(params: list[str], flags : dict[str, any]):
+    print('DELETANDO...')
 
     val = params[0] if params else None
     
-    sql = 'DELETE NOME, URL, DONO FROM SITE WHERE '
+    sql = 'DELETE FROM SITE WHERE '
 
     where = ['URL = :val'] if val else []
     params = {'val': val} if val else {}
@@ -159,11 +186,12 @@ def delete(param : list[str], flags : dict[str, any]):
         print('SQL value:')
         print(sql)
     
-    result = db.query(sql, params)
-    readable_results = [f'{i}: {v}' for i, v in enumerate(result)]
-
+    db.trans(sql, params).commit()
+   
     print('Cadastro deletado com sucesso!')
 
+
+# COMANDOS DISPONÍVEIS
 commands = {
     'quit': { # Presente por motivos de completude
         'h': 'Finaliza a sessão.',
@@ -188,13 +216,16 @@ commands = {
     'insert': {
         'h': 'Cadastra um novo site.',
         'f': insert,
-    }
+    },
+    'delete': {
+        'h': 'Deleta um site.',
+        'f': delete,
+    },
 }
 
 
 
-
-
+# MAIN
 if '__main__' == __name__:
     print(
         '======================================================='
@@ -208,24 +239,30 @@ if '__main__' == __name__:
     print('\n'.join([f'{k} \t\t:\t\t {v["h"]}' for k, v in commands.items()]))
     print('\n')
 
+    # Loop de execução
     while True:
         i = input('> ')
 
+        # Tratando o input
         params = [x for x in i.split(' ') if x]
         if not params: continue # Avoiding erros
 
+        # qual comando será executado?
         cmd = commands.get(params[0])
 
+        # Saida do loop
         print ('- ', end='')
         if commands['quit'] is cmd: break
         if None == cmd: 
             print('[ERRO] Comando não encontrado...\n')
             continue
 
+        # separando parametros e flags
         temp = parse_params(params)
         params = temp['params']
         flags = temp['flags']
 
+        # Execução do comando
         try:
             cmd['f'](params, flags)
         except Exception as e:
